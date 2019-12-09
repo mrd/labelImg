@@ -212,6 +212,9 @@ class MainWindow(QMainWindow, WindowMixin):
         openNextImg = action(getStr('nextImg'), self.openNextImg,
                              'd', 'next', getStr('nextImgDetail'))
 
+        openNextImgDupBoxes = action(getStr('nextImgDupBoxes'), self.openNextImgDupBoxes,
+                                     'Alt+d', 'next', getStr('nextImgDupBoxesDetail'))
+
         openPrevImg = action(getStr('prevImg'), self.openPrevImg,
                              'a', 'prev', getStr('prevImgDetail'))
 
@@ -389,11 +392,11 @@ class MainWindow(QMainWindow, WindowMixin):
 
         self.tools = self.toolbar('Tools')
         self.actions.beginner = (
-            open, opendir, changeSavedir, openNextImg, openPrevImg, verify, save, save_format, None, create, copy, delete, None,
+            open, opendir, changeSavedir, openNextImg, openNextImgDupBoxes, openPrevImg, verify, save, save_format, None, create, copy, delete, None,
             zoomIn, zoom, zoomOut, fitWindow, fitWidth)
 
         self.actions.advanced = (
-            open, opendir, changeSavedir, openNextImg, openPrevImg, save, save_format, None,
+            open, opendir, changeSavedir, openNextImg, openNextImgDupBoxes, openPrevImg, save, save_format, None,
             createMode, editMode, None,
             hideAll, showAll)
 
@@ -1271,6 +1274,18 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if filename:
             self.loadFile(filename)
+
+    def openNextImgDupBoxes(self, _value=False):
+        # duplicate boxes from current image
+        shapes = self.canvas.shapes.copy()
+        self.openNextImg(_value)
+        if self.canvas.shapes:
+            del shapes  # don't overwrite existing shapes
+        else:
+            self.canvas.shapes = shapes # dup the shapes
+            for shape in shapes:
+                self.addLabel(shape)
+                self.setDirty()
 
     def openFile(self, _value=False):
         if not self.mayContinue():
